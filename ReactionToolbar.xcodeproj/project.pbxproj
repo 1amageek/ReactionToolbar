@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		1212E9B51C93A25200F6B0D4 /* ExpressionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1212E9B41C93A25200F6B0D4 /* ExpressionView.swift */; };
+		1212E9B71C94333C00F6B0D4 /* background.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 1212E9B61C94333C00F6B0D4 /* background.jpg */; };
+		1212E9B91C944BD600F6B0D4 /* ReactionBarButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1212E9B81C944BD600F6B0D4 /* ReactionBarButtonItem.swift */; };
 		123931D41C916C4E00C2C56D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 123931D31C916C4E00C2C56D /* AppDelegate.swift */; };
 		123931D61C916C4E00C2C56D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 123931D51C916C4E00C2C56D /* ViewController.swift */; };
 		123931D91C916C4E00C2C56D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 123931D71C916C4E00C2C56D /* Main.storyboard */; };
@@ -19,6 +21,8 @@
 
 /* Begin PBXFileReference section */
 		1212E9B41C93A25200F6B0D4 /* ExpressionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExpressionView.swift; sourceTree = "<group>"; };
+		1212E9B61C94333C00F6B0D4 /* background.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = background.jpg; sourceTree = "<group>"; };
+		1212E9B81C944BD600F6B0D4 /* ReactionBarButtonItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReactionBarButtonItem.swift; sourceTree = "<group>"; };
 		123931D01C916C4E00C2C56D /* ReactionToolbar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ReactionToolbar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		123931D31C916C4E00C2C56D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		123931D51C916C4E00C2C56D /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -63,9 +67,11 @@
 				123931D31C916C4E00C2C56D /* AppDelegate.swift */,
 				123931D51C916C4E00C2C56D /* ViewController.swift */,
 				123931E51C916C6A00C2C56D /* ReactionToolbar.swift */,
+				1212E9B81C944BD600F6B0D4 /* ReactionBarButtonItem.swift */,
 				1212E9B41C93A25200F6B0D4 /* ExpressionView.swift */,
 				123931E71C92E9F700C2C56D /* ExpressionViewCell.swift */,
 				123931D71C916C4E00C2C56D /* Main.storyboard */,
+				1212E9B61C94333C00F6B0D4 /* background.jpg */,
 				123931DA1C916C4E00C2C56D /* Assets.xcassets */,
 				123931DC1C916C4E00C2C56D /* LaunchScreen.storyboard */,
 				123931DF1C916C4E00C2C56D /* Info.plist */,
@@ -132,6 +138,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				123931DE1C916C4E00C2C56D /* LaunchScreen.storyboard in Resources */,
+				1212E9B71C94333C00F6B0D4 /* background.jpg in Resources */,
 				123931DB1C916C4E00C2C56D /* Assets.xcassets in Resources */,
 				123931D91C916C4E00C2C56D /* Main.storyboard in Resources */,
 			);
@@ -149,6 +156,7 @@
 				123931D41C916C4E00C2C56D /* AppDelegate.swift in Sources */,
 				1212E9B51C93A25200F6B0D4 /* ExpressionView.swift in Sources */,
 				123931E61C916C6A00C2C56D /* ReactionToolbar.swift in Sources */,
+				1212E9B91C944BD600F6B0D4 /* ReactionBarButtonItem.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

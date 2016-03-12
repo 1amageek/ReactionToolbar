@@ -11,13 +11,18 @@ import UIKit
 class ViewController: UIViewController {
     
     lazy var reactionToolbar: ReactionToolbar = {
-        var reactionToolbar: ReactionToolbar = ReactionToolbar(frame: CGRect(x: 0, y: 0, width: self.view.bounds.width, height: 100))
+        var reactionToolbar: ReactionToolbar = ReactionToolbar(frame: CGRect(x: 0, y: self.view.bounds.height - 44, width: self.view.bounds.width, height: 44))
         reactionToolbar.expressions = [0,1,2,3,4,5]
         return reactionToolbar
     }()
     
     override func loadView() {
         super.loadView()
+        let imageView: UIImageView = UIImageView(image: UIImage(named: "background.jpg"))
+        imageView.contentMode = UIViewContentMode.ScaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.frame = self.view.bounds
+        self.view.addSubview(imageView)
         self.view.addSubview(self.reactionToolbar)
     }
 
