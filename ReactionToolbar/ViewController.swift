@@ -13,8 +13,11 @@ class ViewController: UIViewController {
     lazy var reactionToolbar: ReactionToolbar = {
         var reactionToolbar: ReactionToolbar = ReactionToolbar(frame: CGRect(x: 0, y: self.view.bounds.height - 44, width: self.view.bounds.width, height: 44))
         reactionToolbar.expressions = [0,1,2,3,4,5]
+        reactionToolbar.setItems([self.likeBarButtonItem], animated: false)
         return reactionToolbar
     }()
+
+    var likeBarButtonItem: ReactionBarButtonItem = ReactionBarButtonItem(title: "Like", style: .Plain, target: nil, action: nil)
     
     override func loadView() {
         super.loadView()

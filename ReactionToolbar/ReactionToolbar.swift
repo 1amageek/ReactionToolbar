@@ -13,6 +13,16 @@ class ReactionToolbar: UIView, UICollectionViewDelegate, UICollectionViewDataSou
     let toolbarHeight: CGFloat = 44
     let expressionViewHeight: CGFloat = 88
     
+    var translucent: Bool = false
+    var items: [UIBarButtonItem]? {
+        didSet {
+            setItems(items, animated: false)
+        }
+    }
+    func setItems(items: [UIBarButtonItem]?, animated: Bool) {
+        self.toolbar.setItems(items, animated: animated)
+    }
+    
     var itemSize: CGSize = CGSizeZero
     var contentInset: UIEdgeInsets = UIEdgeInsets(top: 0, left: 40, bottom: 0, right: 40)
     var expressions: [AnyObject]? {
@@ -27,7 +37,7 @@ class ReactionToolbar: UIView, UICollectionViewDelegate, UICollectionViewDataSou
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.backgroundColor = UIColor.grayColor()
+        self.backgroundColor = UIColor.clearColor()
         self.addSubview(self.toolbar)
         self.addGestureRecognizer(self.longPressGestureRecognzier)
         
@@ -47,8 +57,8 @@ class ReactionToolbar: UIView, UICollectionViewDelegate, UICollectionViewDataSou
         expressionBackgroundView.layer.cornerRadius = self.itemSize.height/2
     }
     
-    private lazy var toolbar: _TransparentToolbar = {
-        var toolbar: _TransparentToolbar = _TransparentToolbar(frame: CGRect(x: 0, y: self.bounds.height - self.toolbarHeight, width: self.bounds.width, height: self.toolbarHeight))
+    lazy var toolbar: UIToolbar = {
+        var toolbar: UIToolbar = UIToolbar(frame: CGRect(x: 0, y: self.bounds.height - self.toolbarHeight, width: self.bounds.width, height: self.toolbarHeight))
         return toolbar
     }()
     
@@ -74,11 +84,20 @@ class ReactionToolbar: UIView, UICollectionViewDelegate, UICollectionViewDataSou
                 let side: CGFloat = (self.bounds.width - contentInset.left - contentInset.right) / CGFloat((expressions?.count)!)
                 let index: Int = Int((location.x - contentInset.left) / side)
                 let indexPath: NSIndexPath = NSIndexPath(forItem: index, inSection: 0)
+                
+                if selectedIndexPath == nil {
+                    let side: CGFloat = (self.bounds.width - contentInset.left - contentInset.right - itemSize.width * itemScale) / CGFloat((expressions?.count)! - 1)
+                    let originY: CGFloat = self.backgroundView.bounds.height/2 + self.itemSize.height/2 - side
+                    UIView.animateWithDuration(0.33, animations: { () -> Void in
+                        self.expressionBackgroundView.frame = CGRect(x: self.contentInset.left, y: originY, width: self.bounds.size.width - self.contentInset.left - self.contentInset.right, height: side)
+                        self.expressionBackgroundView.layer.cornerRadius = side/2
+                    })
+                }
+                
                 if selectedIndexPath?.compare(indexPath) != NSComparisonResult.OrderedSame {
                     self.selectedIndexPath = NSIndexPath(forItem: index, inSection: 0)
                     UIView.animateWithDuration(0.33, animations: { () -> Void in
                         self.expressionView.collectionViewLayout.invalidateLayout()
-                        self.setNeedsLayout()
                     })
                 }
             } else {
@@ -87,18 +106,57 @@ class ReactionToolbar: UIView, UICollectionViewDelegate, UICollectionViewDataSou
                     UIView.animateWithDuration(0.33, animations: { () -> Void in
                         self.expressionView.collectionViewLayout.invalidateLayout()
                     })
+                    
+                    let originY: CGFloat = self.backgroundView.bounds.height/2 - self.itemSize.height/2
+                    UIView.animateWithDuration(0.33, animations: { () -> Void in
+                        self.expressionBackgroundView.frame = CGRect(x: self.contentInset.left, y: originY, width: self.bounds.size.width - self.contentInset.left - self.contentInset.right, height: self.itemSize.height)
+                        self.expressionBackgroundView.layer.cornerRadius = self.itemSize.height/2
+                    })
                 }
             }
         }
         
-        if state == UIGestureRecognizerState.Ended || state == UIGestureRecognizerState.Failed {
-            guard let indexPath = selectedIndexPath else {
-                return
+        if state == UIGestureRecognizerState.Ended || state == UIGestureRecognizerState.Failed || state == UIGestureRecognizerState.Cancelled {
+            
+            UIView.animateWithDuration(0.33, animations: { () -> Void in
+                self.expressionBackgroundView.transform = CGAffineTransformMakeTranslation(0, 44)
+                self.expressionBackgroundView.alpha = 0
+            })
+            
+            let visibleCells = self.expressionView.visibleCells()
+            for (index, cell) in visibleCells.enumerate() {
+                cell.transform = CGAffineTransformIdentity
+                if index == selectedIndexPath?.item {
+                    UIView.animateWithDuration(0.3, delay: 0, options: [UIViewAnimationOptions.CurveEaseOut], animations: { () -> Void in
+                        cell.transform = CGAffineTransformConcat(CGAffineTransformMakeTranslation(0, -100), CGAffineTransformMakeScale(0.1, 0.1))
+                        cell.alpha = 0
+                        }, completion: { (finished) -> Void in
+                            
+                            if index == (visibleCells.count - 1) {
+                                self.backgroundView.removeFromSuperview()
+                                self.expressionBackgroundView.transform = CGAffineTransformIdentity
+                                self.expressionBackgroundView.alpha = 1
+                                self.selectedIndexPath = nil
+                            }
+                            
+                    })
+                } else {
+                    UIView.animateWithDuration(0.3, delay: 0.02 * Double(index), options: [UIViewAnimationOptions.CurveEaseOut], animations: { () -> Void in
+                        cell.transform = CGAffineTransformConcat(CGAffineTransformMakeTranslation(0, 100), CGAffineTransformMakeScale(0.1, 0.1))
+                        cell.alpha = 0
+                        }, completion: { (finished) -> Void in
+                            
+                            if index == (visibleCells.count - 1) {
+                                self.backgroundView.removeFromSuperview()
+                                self.expressionBackgroundView.transform = CGAffineTransformIdentity
+                                self.expressionBackgroundView.alpha = 1
+                                self.selectedIndexPath = nil
+                            }
+                            
+                    })
+                }
             }
-            print(indexPath)
-            backgroundView.removeFromSuperview()
         }
-
     }
     
     // MARK: - Expression view
@@ -106,7 +164,7 @@ class ReactionToolbar: UIView, UICollectionViewDelegate, UICollectionViewDataSou
     lazy var backgroundView: UIView = {
         let frame = CGRect(x: 0, y: 0, width: self.bounds.size.width, height: self.expressionViewHeight)
         var backgroundView: UIView = UIView(frame: frame)
-        backgroundView.backgroundColor = UIColor.redColor()
+        backgroundView.backgroundColor = UIColor.clearColor()
         return backgroundView
     }()
     
@@ -114,12 +172,15 @@ class ReactionToolbar: UIView, UICollectionViewDelegate, UICollectionViewDataSou
         let frame = CGRect(x: self.contentInset.left, y: 0, width: self.bounds.size.width - self.contentInset.left - self.contentInset.right, height: self.itemSize.height)
         var expressionBackgroundView: UIView = UIView(frame: frame)
         expressionBackgroundView.backgroundColor = UIColor.whiteColor()
+//        expressionBackgroundView.layer.shadowRadius = 15
+//        expressionBackgroundView.layer.shadowOffset = CGSize(width: 0, height: 2)
+//        expressionBackgroundView.layer.shadowColor = UIColor.blackColor().CGColor
         return expressionBackgroundView
     }()
     
     lazy var expressionView: ExpressionView = {
         let frame = CGRect(x: 0, y: 0, width: self.bounds.size.width, height: self.expressionViewHeight)
-        let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
+        let layout: ExpressionLayout = ExpressionLayout()
         layout.scrollDirection = .Horizontal
         var expressionView: ExpressionView = ExpressionView(frame: frame, collectionViewLayout: layout)
         expressionView.allowsSelection = false
@@ -145,13 +206,10 @@ class ReactionToolbar: UIView, UICollectionViewDelegate, UICollectionViewDataSou
     }
     
     func collectionView(collectionView: UICollectionView, willDisplayCell cell: UICollectionViewCell, forItemAtIndexPath indexPath: NSIndexPath) {
-
-        cell.transform = CGAffineTransformConcat(CGAffineTransformMakeTranslation(0, 44), CGAffineTransformMakeTranslation(0.85, 0.85))
-        
-        UIView.animateWithDuration(0.15, delay: 0.03 * Double(indexPath.item), options: [UIViewAnimationOptions.CurveEaseOut], animations: { () -> Void in
+        cell.transform = CGAffineTransformConcat(CGAffineTransformMakeTranslation(0, 88), CGAffineTransformMakeScale(0.3, 0.3))
+        UIView.animateWithDuration(0.3, delay: 0.02 * Double(indexPath.item), options: [UIViewAnimationOptions.CurveEaseOut], animations: { () -> Void in
             cell.transform = CGAffineTransformIdentity
             }, completion: nil)
-        
     }
     
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAtIndex section: Int) -> CGFloat {
@@ -183,15 +241,27 @@ class ReactionToolbar: UIView, UICollectionViewDelegate, UICollectionViewDataSou
 
 class _TransparentToolbar: UIToolbar {
     
+//    override var translucent: Bool {
+//        didSet {
+//            if translucent {
+//                self.backgroundColor = UIColor.clearColor()
+//                self.opaque = false
+//            }
+//        }
+//    }
+    
     override func drawRect(rect: CGRect) {
-        
+        if translucent {
+            
+        } else {
+            super.drawRect(rect)
+        }
     }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-//        self.backgroundColor = UIColor.clearColor()
-//        self.opaque = false
-//        self.translucent = true
+        self.backgroundColor = UIColor.clearColor()
+        self.opaque = false
     }
 
     required init?(coder aDecoder: NSCoder) {

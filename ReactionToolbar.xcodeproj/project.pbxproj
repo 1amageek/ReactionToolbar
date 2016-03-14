@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		120EAA8E1C96FC1300D8265E /* ExpressionLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 120EAA8D1C96FC1300D8265E /* ExpressionLayout.swift */; };
 		1212E9B51C93A25200F6B0D4 /* ExpressionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1212E9B41C93A25200F6B0D4 /* ExpressionView.swift */; };
 		1212E9B71C94333C00F6B0D4 /* background.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 1212E9B61C94333C00F6B0D4 /* background.jpg */; };
 		1212E9B91C944BD600F6B0D4 /* ReactionBarButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1212E9B81C944BD600F6B0D4 /* ReactionBarButtonItem.swift */; };
@@ -20,6 +21,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		120EAA8D1C96FC1300D8265E /* ExpressionLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExpressionLayout.swift; sourceTree = "<group>"; };
 		1212E9B41C93A25200F6B0D4 /* ExpressionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExpressionView.swift; sourceTree = "<group>"; };
 		1212E9B61C94333C00F6B0D4 /* background.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = background.jpg; sourceTree = "<group>"; };
 		1212E9B81C944BD600F6B0D4 /* ReactionBarButtonItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReactionBarButtonItem.swift; sourceTree = "<group>"; };
@@ -70,6 +72,7 @@
 				1212E9B81C944BD600F6B0D4 /* ReactionBarButtonItem.swift */,
 				1212E9B41C93A25200F6B0D4 /* ExpressionView.swift */,
 				123931E71C92E9F700C2C56D /* ExpressionViewCell.swift */,
+				120EAA8D1C96FC1300D8265E /* ExpressionLayout.swift */,
 				123931D71C916C4E00C2C56D /* Main.storyboard */,
 				1212E9B61C94333C00F6B0D4 /* background.jpg */,
 				123931DA1C916C4E00C2C56D /* Assets.xcassets */,
@@ -155,6 +158,7 @@
 				123931D61C916C4E00C2C56D /* ViewController.swift in Sources */,
 				123931D41C916C4E00C2C56D /* AppDelegate.swift in Sources */,
 				1212E9B51C93A25200F6B0D4 /* ExpressionView.swift in Sources */,
+				120EAA8E1C96FC1300D8265E /* ExpressionLayout.swift in Sources */,
 				123931E61C916C6A00C2C56D /* ReactionToolbar.swift in Sources */,
 				1212E9B91C944BD600F6B0D4 /* ReactionBarButtonItem.swift in Sources */,
 			);
