@@ -8,19 +8,31 @@
 
 import UIKit
 
-class ReactionToolbar: UIView, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+class ReactionToolbar: UIView, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UIGestureRecognizerDelegate {
     
     let toolbarHeight: CGFloat = 44
     let expressionViewHeight: CGFloat = 88
     
+    var reactionBarButtonItem: ReactionBarButtonItem?
     var translucent: Bool = false
     var items: [UIBarButtonItem]? {
-        didSet {
-            setItems(items, animated: false)
+        
+        get {
+            return self.toolbar.items
         }
+        
+        set(items) {
+            self.setItems(items, animated: false)
+        }
+        
     }
     func setItems(items: [UIBarButtonItem]?, animated: Bool) {
         self.toolbar.setItems(items, animated: animated)
+        for (_, barButtonItem) in (items?.enumerate())! {
+            if barButtonItem.isKindOfClass(ReactionBarButtonItem.self) {
+                self.reactionBarButtonItem = barButtonItem as? ReactionBarButtonItem
+            }
+        }
     }
     
     var itemSize: CGSize = CGSizeZero
@@ -66,6 +78,7 @@ class ReactionToolbar: UIView, UICollectionViewDelegate, UICollectionViewDataSou
     
     lazy var longPressGestureRecognzier: UILongPressGestureRecognizer = {
         var longPressGestureRecognzier: UILongPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: "longPressGesture:")
+        longPressGestureRecognzier.delegate = self
         return longPressGestureRecognzier
     }()
     
@@ -235,6 +248,19 @@ class ReactionToolbar: UIView, UICollectionViewDelegate, UICollectionViewDataSou
         }
         let side: CGFloat = (self.bounds.width - contentInset.left - contentInset.right - itemSize.width * itemScale) / CGFloat((expressions?.count)! - 1)
         return CGSizeMake(side, side)
+    }
+    
+    // MARK: - UIGestureRecognizer
+    
+    override func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
+        let location: CGPoint = gestureRecognizer.locationInView(self)
+        guard let barButtonItem = self.reactionBarButtonItem else {
+            return false
+        }
+        if CGRectContainsPoint((barButtonItem.customView?.frame)!, location) {
+            return true
+        }
+        return false
     }
     
 }
