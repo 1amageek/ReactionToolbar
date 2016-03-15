@@ -11,7 +11,8 @@ import UIKit
 class ReactionToolbar: UIView, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UIGestureRecognizerDelegate {
     
     let toolbarHeight: CGFloat = 44
-    let expressionViewHeight: CGFloat = 88
+    let expressionViewHeight: CGFloat = 120
+    var animationDuration: NSTimeInterval = 0.18
     
     var reactionBarButtonItem: ReactionBarButtonItem?
     var translucent: Bool = false
@@ -37,15 +38,18 @@ class ReactionToolbar: UIView, UICollectionViewDelegate, UICollectionViewDataSou
     
     var itemSize: CGSize = CGSizeZero
     var contentInset: UIEdgeInsets = UIEdgeInsets(top: 0, left: 40, bottom: 0, right: 40)
+    var sectionContentInset: UIEdgeInsets = UIEdgeInsets(top: 0, left: 3, bottom: 32, right: 3)
+    var backgroundContentInset: UIEdgeInsets = UIEdgeInsets(top: 6, left: 6, bottom: 6, right: 6)
     var expressions: [AnyObject]? {
         didSet {
-            let side: CGFloat = (self.bounds.width - contentInset.left - contentInset.right) / CGFloat((expressions?.count)!)
+            let numberOfExpressions: CGFloat = CGFloat((expressions?.count)!)
+            let side: CGFloat = floor(((self.bounds.width - contentInset.left - contentInset.right) - ((sectionContentInset.right + sectionContentInset.left) * numberOfExpressions)) / numberOfExpressions)
             self.itemSize = CGSize(width: side, height: side)
         }
     }
     
     var selectedIndexPath: NSIndexPath?
-    var itemScale: CGFloat = 1.5 // 1 ~ 10
+    var itemScale: CGFloat = 1.7 // 1 ~ 1.5
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -64,9 +68,10 @@ class ReactionToolbar: UIView, UICollectionViewDelegate, UICollectionViewDataSou
     override func layoutSubviews() {
         super.layoutSubviews()
         backgroundView.frame = CGRectMake(0, -expressionViewHeight, self.bounds.width, expressionViewHeight)
-        expressionBackgroundView.frame = CGRect(x: self.contentInset.left, y: 0, width: self.bounds.size.width - self.contentInset.left - self.contentInset.right, height: self.itemSize.height)
-        expressionBackgroundView.center = CGPointMake(backgroundView.bounds.width/2, backgroundView.bounds.height/2)
-        expressionBackgroundView.layer.cornerRadius = self.itemSize.height/2
+        let width: CGFloat = self.bounds.size.width - self.contentInset.left - self.contentInset.right + self.backgroundContentInset.left + self.backgroundContentInset.right
+        let height: CGFloat = self.backgroundContentInset.top + self.itemSize.height + self.backgroundContentInset.bottom
+        expressionBackgroundView.frame = CGRect(x: self.contentInset.left - self.backgroundContentInset.left, y: backgroundView.bounds.height - height - sectionContentInset.bottom + backgroundContentInset.top, width: width, height: height)
+        expressionBackgroundView.layer.cornerRadius = height/2
     }
     
     lazy var toolbar: UIToolbar = {
@@ -96,34 +101,37 @@ class ReactionToolbar: UIView, UICollectionViewDelegate, UICollectionViewDataSou
             if contentInset.left < location.x && location.x < (self.bounds.width - contentInset.right){
                 let side: CGFloat = (self.bounds.width - contentInset.left - contentInset.right) / CGFloat((expressions?.count)!)
                 let index: Int = Int((location.x - contentInset.left) / side)
-                let indexPath: NSIndexPath = NSIndexPath(forItem: index, inSection: 0)
+                let indexPath: NSIndexPath = NSIndexPath(forItem: 0, inSection: index)
                 
                 if selectedIndexPath == nil {
-                    let side: CGFloat = (self.bounds.width - contentInset.left - contentInset.right - itemSize.width * itemScale) / CGFloat((expressions?.count)! - 1)
-                    let originY: CGFloat = self.backgroundView.bounds.height/2 + self.itemSize.height/2 - side
-                    UIView.animateWithDuration(0.33, animations: { () -> Void in
-                        self.expressionBackgroundView.frame = CGRect(x: self.contentInset.left, y: originY, width: self.bounds.size.width - self.contentInset.left - self.contentInset.right, height: side)
-                        self.expressionBackgroundView.layer.cornerRadius = side/2
+                    let numberOfExpressions: CGFloat = CGFloat((expressions?.count)! - 1)
+                    let side: CGFloat = floor(((self.bounds.width - contentInset.left - contentInset.right) - ((sectionContentInset.right + sectionContentInset.left) * numberOfExpressions) - (itemSize.width + self.sectionContentInset.left + self.sectionContentInset.right) * itemScale) / numberOfExpressions)
+                    let width: CGFloat = self.bounds.size.width - self.contentInset.left - self.contentInset.right + self.backgroundContentInset.left + self.backgroundContentInset.right
+                    let height: CGFloat = self.backgroundContentInset.top + side + self.backgroundContentInset.bottom
+                    UIView.animateWithDuration(animationDuration, animations: { () -> Void in
+                        self.expressionBackgroundView.frame = CGRect(x: self.contentInset.left - self.backgroundContentInset.left, y: self.backgroundView.bounds.height - height - self.sectionContentInset.bottom + self.backgroundContentInset.top, width: width, height: height)
+                        self.expressionBackgroundView.layer.cornerRadius = height/2
                     })
                 }
                 
                 if selectedIndexPath?.compare(indexPath) != NSComparisonResult.OrderedSame {
-                    self.selectedIndexPath = NSIndexPath(forItem: index, inSection: 0)
-                    UIView.animateWithDuration(0.33, animations: { () -> Void in
+                    self.selectedIndexPath = indexPath
+                    UIView.animateWithDuration(animationDuration, animations: { () -> Void in
                         self.expressionView.collectionViewLayout.invalidateLayout()
                     })
                 }
             } else {
                 if selectedIndexPath != nil {
                     self.selectedIndexPath = nil
-                    UIView.animateWithDuration(0.33, animations: { () -> Void in
+                    UIView.animateWithDuration(animationDuration, animations: { () -> Void in
                         self.expressionView.collectionViewLayout.invalidateLayout()
                     })
                     
-                    let originY: CGFloat = self.backgroundView.bounds.height/2 - self.itemSize.height/2
-                    UIView.animateWithDuration(0.33, animations: { () -> Void in
-                        self.expressionBackgroundView.frame = CGRect(x: self.contentInset.left, y: originY, width: self.bounds.size.width - self.contentInset.left - self.contentInset.right, height: self.itemSize.height)
-                        self.expressionBackgroundView.layer.cornerRadius = self.itemSize.height/2
+                    UIView.animateWithDuration(animationDuration, animations: { () -> Void in
+                        let width: CGFloat = self.bounds.size.width - self.contentInset.left - self.contentInset.right + self.backgroundContentInset.left + self.backgroundContentInset.right
+                        let height: CGFloat = self.backgroundContentInset.top + self.itemSize.height + self.backgroundContentInset.bottom
+                        self.expressionBackgroundView.frame = CGRect(x: self.contentInset.left - self.backgroundContentInset.left, y: self.backgroundView.bounds.height - height - self.sectionContentInset.bottom + self.backgroundContentInset.top, width: width, height: height)
+                        self.expressionBackgroundView.layer.cornerRadius = height/2
                     })
                 }
             }
@@ -140,7 +148,7 @@ class ReactionToolbar: UIView, UICollectionViewDelegate, UICollectionViewDataSou
             for (index, cell) in visibleCells.enumerate() {
                 cell.transform = CGAffineTransformIdentity
                 if index == selectedIndexPath?.item {
-                    UIView.animateWithDuration(0.3, delay: 0, options: [UIViewAnimationOptions.CurveEaseOut], animations: { () -> Void in
+                    UIView.animateWithDuration(animationDuration, delay: 0, options: [UIViewAnimationOptions.CurveEaseOut], animations: { () -> Void in
                         cell.transform = CGAffineTransformConcat(CGAffineTransformMakeTranslation(0, -100), CGAffineTransformMakeScale(0.1, 0.1))
                         cell.alpha = 0
                         }, completion: { (finished) -> Void in
@@ -154,7 +162,7 @@ class ReactionToolbar: UIView, UICollectionViewDelegate, UICollectionViewDataSou
                             
                     })
                 } else {
-                    UIView.animateWithDuration(0.3, delay: 0.02 * Double(index), options: [UIViewAnimationOptions.CurveEaseOut], animations: { () -> Void in
+                    UIView.animateWithDuration(animationDuration, delay: 0.02 * Double(index), options: [UIViewAnimationOptions.CurveEaseOut], animations: { () -> Void in
                         cell.transform = CGAffineTransformConcat(CGAffineTransformMakeTranslation(0, 100), CGAffineTransformMakeScale(0.1, 0.1))
                         cell.alpha = 0
                         }, completion: { (finished) -> Void in
@@ -178,6 +186,7 @@ class ReactionToolbar: UIView, UICollectionViewDelegate, UICollectionViewDataSou
         let frame = CGRect(x: 0, y: 0, width: self.bounds.size.width, height: self.expressionViewHeight)
         var backgroundView: UIView = UIView(frame: frame)
         backgroundView.backgroundColor = UIColor.clearColor()
+        backgroundView.clipsToBounds = false
         return backgroundView
     }()
     
@@ -185,6 +194,7 @@ class ReactionToolbar: UIView, UICollectionViewDelegate, UICollectionViewDataSou
         let frame = CGRect(x: self.contentInset.left, y: 0, width: self.bounds.size.width - self.contentInset.left - self.contentInset.right, height: self.itemSize.height)
         var expressionBackgroundView: UIView = UIView(frame: frame)
         expressionBackgroundView.backgroundColor = UIColor.whiteColor()
+        expressionBackgroundView.clipsToBounds = false
 //        expressionBackgroundView.layer.shadowRadius = 15
 //        expressionBackgroundView.layer.shadowOffset = CGSize(width: 0, height: 2)
 //        expressionBackgroundView.layer.shadowColor = UIColor.blackColor().CGColor
@@ -201,16 +211,17 @@ class ReactionToolbar: UIView, UICollectionViewDelegate, UICollectionViewDataSou
         expressionView.alwaysBounceVertical = false
         expressionView.delegate = self
         expressionView.dataSource = self
+        expressionView.contentInset = self.contentInset
         expressionView.registerClass(ExpressionViewCell.self, forCellWithReuseIdentifier: "ExpressionViewCell")
         return expressionView
     }()
     
     func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
-        return 1
+        return (expressions?.count)!
     }
     
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return (expressions?.count)!
+        return 1
     }
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
@@ -234,7 +245,25 @@ class ReactionToolbar: UIView, UICollectionViewDelegate, UICollectionViewDataSou
     }
     
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAtIndex section: Int) -> UIEdgeInsets {
-        return contentInset
+        
+        let indexPath: NSIndexPath = NSIndexPath(forItem: 0, inSection: section)
+        
+        if selectedIndexPath != nil {
+            if selectedIndexPath?.compare(indexPath) == NSComparisonResult.OrderedSame {
+                let side = floor((itemSize.width + self.sectionContentInset.left + self.sectionContentInset.right) * itemScale)
+                let top: CGFloat = self.expressionView.bounds.height - side - self.sectionContentInset.bottom
+                return UIEdgeInsetsMake(top, 0, self.sectionContentInset.bottom, 0)
+            }
+            
+            let numberOfExpressions: CGFloat = CGFloat((expressions?.count)! - 1)
+            let side: CGFloat = floor(((self.bounds.width - contentInset.left - contentInset.right) - ((sectionContentInset.right + sectionContentInset.left) * numberOfExpressions) - (itemSize.width + self.sectionContentInset.left + self.sectionContentInset.right) * itemScale) / numberOfExpressions)
+            let top: CGFloat = self.expressionView.bounds.height - side - self.sectionContentInset.bottom
+            return UIEdgeInsetsMake(top, self.sectionContentInset.right, self.sectionContentInset.bottom, self.sectionContentInset.right)
+            
+        }
+
+        let top: CGFloat = self.expressionView.bounds.height - self.itemSize.height - self.sectionContentInset.bottom
+        return UIEdgeInsetsMake(top, self.sectionContentInset.right, self.sectionContentInset.bottom, self.sectionContentInset.right)
     }
     
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
@@ -244,10 +273,12 @@ class ReactionToolbar: UIView, UICollectionViewDelegate, UICollectionViewDataSou
         }
         
         if selectedIndexPath?.compare(indexPath) == NSComparisonResult.OrderedSame {
-            return CGSize(width: itemSize.width * itemScale, height: itemSize.height * itemScale)
+            let side = floor((itemSize.width + self.sectionContentInset.left + self.sectionContentInset.right) * itemScale)
+            return CGSize(width: side, height: side)
         }
-        let side: CGFloat = (self.bounds.width - contentInset.left - contentInset.right - itemSize.width * itemScale) / CGFloat((expressions?.count)! - 1)
-        return CGSizeMake(side, side)
+        let numberOfExpressions: CGFloat = CGFloat((expressions?.count)! - 1)
+        let side: CGFloat = floor(((self.bounds.width - contentInset.left - contentInset.right) - ((sectionContentInset.right + sectionContentInset.left) * numberOfExpressions) - (itemSize.width + self.sectionContentInset.left + self.sectionContentInset.right) * itemScale) / numberOfExpressions)
+        return CGSize(width: side, height: side)
     }
     
     // MARK: - UIGestureRecognizer

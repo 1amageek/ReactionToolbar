@@ -20,7 +20,7 @@ class ExpressionViewCell: UICollectionViewCell {
     }
     
     override func drawRect(rect: CGRect) {
-        let frame = UIEdgeInsetsInsetRect(self.bounds, UIEdgeInsetsMake(1.5, 1.5, 1.5, 1.5))
+        let frame = UIEdgeInsetsInsetRect(self.bounds, UIEdgeInsetsZero)
         let path = UIBezierPath(ovalInRect: frame)
         UIColor.yellowColor().setFill()
         path.fill()
